@@ -1,3 +1,5 @@
+src/pcc_log.txt
+.vscode
 *.o
 *.so
 *.a
