@@ -275,14 +275,14 @@ void *recv_monitor(void *arguments)
       else
       {
          cout << timestamp() << "," << perf.mbpsRecvRate << endl;
+         sleep(1);
       }
 
       if(perf.msTimeStamp >= args2->duration * 1000)
          stop=true;
+		}
 
-      sleep(args2->perf_interval);
-   }
-
+    
 
    return NULL;
 }
