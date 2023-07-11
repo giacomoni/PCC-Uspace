@@ -29,6 +29,33 @@ void PccPythonRateController::InitializePython() {
     PyRun_SimpleString(set_argv_str.c_str());
 
     python_initialized_ = true;
+
+        // Open a file in append mode.
+  std::ofstream outfile;
+  std::string str1(getenv("EXPERIMENT_PATH"));
+//   if (str1.length() == 0)
+     std::string str2 = "/obsdata.csv";
+  str1 += str2;
+outfile.open(str1.c_str(), std::ios_base::app);
+
+  if (!outfile) {
+    throw std::runtime_error("Unable to open the file");
+  }
+
+  // Writing the values to file.
+  outfile << "bytes_sent" << ','
+          << "bytes_acked" << ','
+          << "bytes_lost" << ','
+          << "send_start_time" << ','
+          << "send_end_time" << ','
+          << "rcv_start_time" << ','
+          << "rcv_end_time" << ','
+          << "first_ack_delay" << ','
+          << "last_ack_delay" << ','
+          << "avg_pkt_size" << ','
+          << "utility" << '\n';
+
+  outfile.close();
 }
 
 int PccPythonRateController::GetNextId() {
@@ -191,6 +218,36 @@ void PccPythonRateController::MonitorIntervalFinished(const MonitorInterval& mi)
         mi.GetAveragePacketSize(),
         mi.GetUtility()
     );
+
+     // Open a file in append mode.
+  std::ofstream outfile;
+  std::string str1(getenv("EXPERIMENT_PATH"));
+    //  std::string str1 = "/home/luca";
+     std::string str2 = "/obsdata.csv";
+  str1 += str2;
+//   outfile.open(str1.c_str(), std::ios_base::app);
+outfile.open(str1, std::ios_base::app);
+
+  if (!outfile) {
+    throw std::runtime_error("Unable to open the file");
+  }
+
+  // Writing the values to file.
+  outfile << mi.GetBytesSent() << ','
+          << mi.GetBytesAcked() << ','
+          << mi.GetBytesLost() << ','
+          << (mi.GetSendStartTime() - time_offset_usec) / (double)USEC_PER_SEC << ','
+          << (mi.GetSendEndTime() - time_offset_usec) / (double)USEC_PER_SEC << ','
+          << (mi.GetRecvStartTime() - time_offset_usec) / (double)USEC_PER_SEC << ','
+          << (mi.GetRecvEndTime() - time_offset_usec) / (double)USEC_PER_SEC << ','
+          << mi.GetFirstAckLatency() / (double)USEC_PER_SEC << ','
+          << mi.GetLastAckLatency() / (double)USEC_PER_SEC << ','
+          << mi.GetAveragePacketSize() << ','
+          << mi.GetUtility() << '\n';
+
+  outfile.close();
+
+
 }
 
 QuicBandwidth PccPythonRateController::GetNextSendingRate(QuicBandwidth current_rate, QuicTime cur_time) {
